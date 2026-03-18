@@ -73,6 +73,37 @@ def mostrar_por_dia(df):
 
     for dia, qtd in por_dia.items():
         print(f"{dia}: {qtd} atendimentos")
+        
+        
+def gerar_relatorio(df, total):
+    with open("relatorio.txt", "w", encoding="utf-8") as f:
+        f.write("RELATÓRIO DE ATENDIMENTOS\n")
+        f.write("=" * 40 + "\n\n")
+
+        f.write("Atendimentos por atendente:\n")
+        por_atendente = df["atendente"].value_counts()
+
+        for atendente, qtd in por_atendente.items():
+            f.write(f"{atendente}: {qtd} atendimentos\n")
+
+        f.write("\n")
+
+        f.write(f"Total de atendimentos: {total}\n\n")
+
+        media = df["duracao"].mean()
+        total_seg = int(media.total_seconds())
+        minutos = total_seg // 60
+        segundos = total_seg % 60
+
+        f.write(f"Tempo médio: {minutos}m {segundos}s\n\n")
+
+        f.write("Atendimentos por dia:\n")
+        por_dia = df["data"].value_counts().sort_index()
+
+        for dia, qtd in por_dia.items():
+            f.write(f"{dia}: {qtd} atendimentos\n")
+
+    print("\n✅ Relatório gerado: relatorio.txt")
 
 
 def main():
@@ -91,7 +122,8 @@ def main():
     mostrar_tempo_medio(df)
 
     mostrar_por_dia(df)
-
+    
+    gerar_relatorio(df, total)
 
 if __name__ == "__main__":
     main()
