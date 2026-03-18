@@ -1,0 +1,97 @@
+import pandas as pd
+
+ARQUIVO = "data/atendimentos.csv"
+
+
+def carregar_dados(caminho):
+    """Carrega o arquivo CSV e limpa os nomes das colunas."""
+    try:
+        df = pd.read_csv(caminho, encoding="latin-1", sep=";")
+    except FileNotFoundError:
+        print("❌ Arquivo não encontrado:", caminho)
+        exit()
+
+    # limpar nomes das colunas
+    df.columns = df.columns.str.strip().str.lower()
+
+    return df
+
+
+def limpar_dados(df):
+    """Remove dados inválidos e converte horários."""
+
+    # remover linhas com valores vazios importantes
+    df = df.dropna(subset=["inicio", "fim", "atendente"])
+
+    # converter horários
+    df["inicio"] = pd.to_datetime(df["inicio"], format="%H:%M:%S", errors="coerce")
+    df["fim"] = pd.to_datetime(df["fim"], format="%H:%M:%S", errors="coerce")
+
+    # remover horários inválidos
+    df = df.dropna(subset=["inicio", "fim"])
+
+    # remover atendimentos com horário incorreto
+    df = df[df["fim"] >= df["inicio"]]
+
+    return df
+
+
+def calcular_duracao(df):
+    """Calcula duração dos atendimentos."""
+    df["duracao"] = df["fim"] - df["inicio"]
+    return df
+
+
+def mostrar_atendentes(df):
+    print("\n" + "-" * 35)
+    print("📋 Atendimentos por atendente")
+    print("-" * 35)
+
+    por_atendente = df["atendente"].value_counts()
+
+    for atendente, qtd in por_atendente.items():
+        print(f"{atendente}: {qtd} atendimentos")
+
+
+def mostrar_tempo_medio(df):
+    media = df["duracao"].mean()
+
+    total_seg = int(media.total_seconds())
+    minutos = total_seg // 60
+    segundos = total_seg % 60
+
+    print("\n⏱ Tempo médio de atendimento:")
+    print(f"{minutos}m {segundos}s")
+
+
+def mostrar_por_dia(df):
+    print("\n" + "-" * 35)
+    print("📅 Atendimentos por dia")
+    print("-" * 35)
+
+    por_dia = df["data"].value_counts().sort_index()
+
+    for dia, qtd in por_dia.items():
+        print(f"{dia}: {qtd} atendimentos")
+
+
+def main():
+    print("📊 Sistema de Relatório de Atendimentos iniciado")
+
+    df = carregar_dados(ARQUIVO)
+    df = limpar_dados(df)
+    df = calcular_duracao(df)
+
+    total = len(df)
+
+    mostrar_atendentes(df)
+
+    print(f"\n📊 Total de atendimentos: {total}")
+
+    mostrar_tempo_medio(df)
+
+    mostrar_por_dia(df)
+
+
+if __name__ == "__main__":
+    main()
