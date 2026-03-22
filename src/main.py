@@ -1,6 +1,13 @@
 import pandas as pd
+import logging
+import sys
 
 ARQUIVO = "data/atendimentos.csv"
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(levelname)s: %(message)s"
+)
 
 
 def carregar_dados(caminho):
@@ -8,29 +15,29 @@ def carregar_dados(caminho):
     try:
         df = pd.read_csv(caminho, encoding="latin-1", sep=";")
     except FileNotFoundError:
-        print("❌ Arquivo não encontrado:", caminho)
-        exit()
+        raise FileNotFoundError(f"Arquivo não encontrado: {caminho}")
 
-    # limpar nomes das colunas
     df.columns = df.columns.str.strip().str.lower()
+
+    colunas_esperadas = {"inicio", "fim", "atendente", "data"}
+    if not colunas_esperadas.issubset(df.columns):
+        raise ValueError("❌ O arquivo não contém todas as colunas obrigatórias")
 
     return df
 
 
 def limpar_dados(df):
     """Remove dados inválidos e converte horários."""
+    df = df.copy()
 
-    # remover linhas com valores vazios importantes
-    df = df.dropna(subset=["inicio", "fim", "atendente"])
+    df = df.dropna(subset=["inicio", "fim", "atendente", "data"])
 
-    # converter horários
     df["inicio"] = pd.to_datetime(df["inicio"], format="%H:%M:%S", errors="coerce")
     df["fim"] = pd.to_datetime(df["fim"], format="%H:%M:%S", errors="coerce")
+    df["data"] = pd.to_datetime(df["data"], errors="coerce")
 
-    # remover horários inválidos
-    df = df.dropna(subset=["inicio", "fim"])
+    df = df.dropna(subset=["inicio", "fim", "data"])
 
-    # remover atendimentos com horário incorreto
     df = df[df["fim"] >= df["inicio"]]
 
     return df
@@ -38,121 +45,122 @@ def limpar_dados(df):
 
 def calcular_duracao(df):
     """Calcula duração dos atendimentos."""
+    df = df.copy()
     df["duracao"] = df["fim"] - df["inicio"]
     return df
 
 
-def mostrar_atendentes(df):
+def formatar_tempo_medio(df):
+    """Retorna tempo médio formatado."""
+    media = df["duracao"].mean()
+
+    if pd.isna(media):
+        return 0, 0
+
+    total_seg = int(media.total_seconds())
+    return total_seg // 60, total_seg % 60
+
+
+def obter_metricas(df):
+    """Centraliza cálculos principais."""
+    total = len(df)
+    por_atendente = df["atendente"].value_counts()
+    por_dia = df["data"].dt.date.value_counts().sort_index()
+    minutos, segundos = formatar_tempo_medio(df)
+
+    return {
+        "total": total,
+        "por_atendente": por_atendente,
+        "por_dia": por_dia,
+        "tempo_medio": (minutos, segundos)
+    }
+
+
+def mostrar_relatorio_terminal(metricas):
+    print("\n📊 Total de atendimentos:", metricas["total"])
+
     print("\n" + "-" * 35)
     print("📋 Atendimentos por atendente")
     print("-" * 35)
-
-    por_atendente = df["atendente"].value_counts()
-
-    for atendente, qtd in por_atendente.items():
+    for atendente, qtd in metricas["por_atendente"].items():
         print(f"{atendente}: {qtd} atendimentos")
 
-
-def mostrar_tempo_medio(df):
-    media = df["duracao"].mean()
-
-    total_seg = int(media.total_seconds())
-    minutos = total_seg // 60
-    segundos = total_seg % 60
-
     print("\n⏱ Tempo médio de atendimento:")
-    print(f"{minutos}m {segundos}s")
+    m, s = metricas["tempo_medio"]
+    print(f"{m}m {s}s")
 
-
-def mostrar_por_dia(df):
     print("\n" + "-" * 35)
     print("📅 Atendimentos por dia")
     print("-" * 35)
-
-    por_dia = df["data"].value_counts().sort_index()
-
-    for dia, qtd in por_dia.items():
+    for dia, qtd in metricas["por_dia"].items():
         print(f"{dia}: {qtd} atendimentos")
-        
-def gerar_excel(df, total):
+
+
+def gerar_excel(df, metricas):
     with pd.ExcelWriter("relatorio.xlsx", engine="openpyxl") as writer:
 
-        # Atendimentos por atendente
-        por_atendente = df["atendente"].value_counts().reset_index()
-        por_atendente.columns = ["Atendente", "Quantidade"]
-        por_atendente.to_excel(writer, sheet_name="Atendentes", index=False)
+        # Atendentes
+        df_atendente = metricas["por_atendente"].reset_index()
+        df_atendente.columns = ["Atendente", "Quantidade"]
+        df_atendente.to_excel(writer, sheet_name="Atendentes", index=False)
 
-        # Atendimentos por dia
-        por_dia = df["data"].value_counts().sort_index().reset_index()
-        por_dia.columns = ["Data", "Quantidade"]
-        por_dia.to_excel(writer, sheet_name="Por Dia", index=False)
+        # Por dia
+        df_dia = metricas["por_dia"].reset_index()
+        df_dia.columns = ["Data", "Quantidade"]
+        df_dia.to_excel(writer, sheet_name="Por Dia", index=False)
 
         # Resumo
-        media = df["duracao"].mean()
-        total_seg = int(media.total_seconds())
-        minutos = total_seg // 60
-        segundos = total_seg % 60
-
+        m, s = metricas["tempo_medio"]
         resumo = pd.DataFrame({
             "Métrica": ["Total de Atendimentos", "Tempo Médio"],
-            "Valor": [total, f"{minutos}m {segundos}s"]
+            "Valor": [metricas["total"], f"{m}m {s}s"]
         })
 
         resumo.to_excel(writer, sheet_name="Resumo", index=False)
 
-    print("✅ Relatório Excel gerado: relatorio.xlsx")
-    
-def gerar_relatorio(df, total):
+    logging.info("Relatório Excel gerado: relatorio.xlsx")
+
+
+def gerar_txt(metricas):
     with open("relatorio.txt", "w", encoding="utf-8") as f:
         f.write("RELATÓRIO DE ATENDIMENTOS\n")
         f.write("=" * 40 + "\n\n")
 
         f.write("Atendimentos por atendente:\n")
-        por_atendente = df["atendente"].value_counts()
-
-        for atendente, qtd in por_atendente.items():
+        for atendente, qtd in metricas["por_atendente"].items():
             f.write(f"{atendente}: {qtd} atendimentos\n")
 
         f.write("\n")
+        f.write(f"Total de atendimentos: {metricas['total']}\n\n")
 
-        f.write(f"Total de atendimentos: {total}\n\n")
-
-        media = df["duracao"].mean()
-        total_seg = int(media.total_seconds())
-        minutos = total_seg // 60
-        segundos = total_seg % 60
-
-        f.write(f"Tempo médio: {minutos}m {segundos}s\n\n")
+        m, s = metricas["tempo_medio"]
+        f.write(f"Tempo médio: {m}m {s}s\n\n")
 
         f.write("Atendimentos por dia:\n")
-        por_dia = df["data"].value_counts().sort_index()
-
-        for dia, qtd in por_dia.items():
+        for dia, qtd in metricas["por_dia"].items():
             f.write(f"{dia}: {qtd} atendimentos\n")
 
-    print("\n✅ Relatório gerado: relatorio.txt")
+    logging.info("Relatório TXT gerado: relatorio.txt")
 
 
 def main():
-    print("📊 Sistema de Relatório de Atendimentos iniciado")
+    logging.info("Sistema iniciado")
 
-    df = carregar_dados(ARQUIVO)
-    df = limpar_dados(df)
-    df = calcular_duracao(df)
+    try:
+        df = carregar_dados(ARQUIVO)
+        df = limpar_dados(df)
+        df = calcular_duracao(df)
 
-    total = len(df)
+        metricas = obter_metricas(df)
 
-    print(f"\n📊 Total de atendimentos: {total}")
+        mostrar_relatorio_terminal(metricas)
+        gerar_excel(df, metricas)
+        gerar_txt(metricas)
 
-    gerar_excel(df, total)
+    except Exception as e:
+        logging.error(f"Erro: {e}")
+        sys.exit(1)
 
-    mostrar_atendentes(df)
-
-    mostrar_tempo_medio(df)
-
-    mostrar_por_dia(df)
-
-    gerar_relatorio(df, total)
 
 if __name__ == "__main__":
     main()
