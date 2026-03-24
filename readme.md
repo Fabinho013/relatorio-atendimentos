@@ -1,61 +1,73 @@
-# 📊 Sistema de Relatório de Atendimentos
+# 📊 Sistema de Relatórios de Atendimentos 📊
+--------------------------------------------------
 
-Projeto desenvolvido em Python para análise de atendimentos a partir de planilhas CSV.
+Projeto desenvolvido em Python com foco em análise e automação de atendimentos.
 
-## 🚀 Funcionalidades
 
-- ✔ Total de atendimentos  
-- ✔ Atendimentos por atendente  
-- ✔ Atendimentos por dia  
-- ✔ Tempo médio de atendimento  
-- ✔ Tratamento de dados inválidos  
+🚀 Funcionalidades 🚀
+--------------------------------------------------
 
-## 🛠 Tecnologias
+- Processamento de arquivos CSV  
+- Cálculo de métricas:
+  - Total de atendimentos
+  - Atendimentos por atendente
+  - Tempo médio
+  - Atendimentos por dia  
+- Geração de relatórios:
+  - TXT
+  - Excel  
+- Interface web com Django  
+
+
+🛠 Tecnologias
+--------------------------------------------------
 
 - Python  
 - Pandas  
+- Django  
 
-## 📁 Estrutura do Projeto
 
-relatorio-atendimentos/
+🚀 Roadmap 🗺️
+--------------------------------------------------
 
-- data/
-  - atendimentos.csv
-- src/
-  - main.py
-- .gitignore
+v1.0 ✅  
+- Processamento de planilhas  
 
-## ▶️ Como executar
+v1.1 ✅  
+- Relatórios em TXT  
 
-pip install pandas  
-python src/main.py
+v1.2 ✅  
+- Relatórios em Excel  
 
-## 📌 Exemplo de saída
+v2.0 ✅ 
+- Estrutura web com Django  
 
-📋 Atendimentos por atendente  
-Ana: 3 atendimentos  
-Carlos: 2 atendimentos  
+v2.1 ✅  
+- Página HTML inicial  
 
-📊 Total de atendimentos: 5  
 
-⏱ Tempo médio: 14m 20s  
+🟡 Próximos passos 🟡
+--------------------------------------------------
 
-📅 Atendimentos por dia  
-01/03: 3 atendimentos  
-02/03: 2 atendimentos  
+- Upload de arquivo via web  
+- Exibição de métricas no navegador  
+- Download de relatórios  
 
-## 📈 Objetivo do Projeto
 
-Este projeto foi desenvolvido com o objetivo de praticar:
+🔴 Futuro 🔴
+--------------------------------------------------
 
-- Manipulação de dados com Python  
-- Análise de dados operacionais  
-- Estruturação de projetos  
-- Boas práticas de programação  
+- Sistema de senhas para atendimento  
+- Registro automático de início/fim de atendimento  
+- Dashboard em tempo real  
+- Sistema de login e permissões  
 
-## 🔄 Próximas melhorias
 
-- Interface web (Django)  
-- Upload de planilhas  
-- Sistema de login  
-- Envio automático de relatórios por e-mail  
+⚙️ Como rodar o projeto
+--------------------------------------------------
+
+.\venv\Scripts\activate  
+cd webapp  
+python manage.py runserver  
+
+Acesse: http://127.0.0.1:8000/
