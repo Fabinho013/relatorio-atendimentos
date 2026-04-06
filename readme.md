@@ -1,31 +1,57 @@
 # 📊 Sistema de Relatórios de Atendimentos
 
+<p align="center">
+  <img src="assets/dashboard.png" width="800"/>
+</p>
+
 ---
 
-Projeto desenvolvido em Python com foco em análise, automação e visualização de atendimentos.
-O sistema permite processar múltiplos arquivos, gerar métricas e exportar relatórios profissionais.
+## 🎥 Demonstração
 
-## 🚀 Funcionalidades
+<p align="center">
+  <img src="assets/demo.gif" width="800"/>
+</p>
 
-* Upload de múltiplos arquivos (CSV e Excel)
-* Processamento e limpeza automática dos dados
-* Cálculo de métricas:
+---
 
-  * Total de atendimentos
-  * Atendimentos por atendente
-  * Tempo médio geral
-  * Tempo médio por atendente
-  * Atendimentos por dia
-* Geração de relatórios:
+## 🚀 Sobre o projeto
 
-  * TXT
-  * Excel (com múltiplas abas)
+Sistema desenvolvido em **Python** com foco em **análise de dados, automação e geração de relatórios**.
+
+A aplicação permite o envio de múltiplos arquivos de atendimentos, processa automaticamente os dados e gera métricas e relatórios profissionais de forma rápida e eficiente.
+
+---
+
+## ✨ Funcionalidades
+
+✔ Upload de múltiplos arquivos (CSV e Excel)
+✔ Processamento e limpeza automática dos dados
+✔ Validação inteligente de arquivos (colunas obrigatórias)
+✔ Tratamento automático de encoding
+
+### 📊 Métricas geradas
+
+* Total de atendimentos
+* Atendimentos por atendente
+* Tempo médio geral
+* Tempo médio por atendente
+* Atendimentos por dia
+
+### 📄 Relatórios
+
+* Exportação em **TXT**
+* Exportação em **Excel** (com múltiplas abas)
+* Download direto pelo navegador
+
+### 🌐 Interface
+
 * Interface web com Django
-* Download de relatório direto pelo navegador
-* Validação inteligente de arquivos (colunas obrigatórias)
-* Tratamento automático de encoding
+* Upload simplificado
+* Feedback de erros e validação na tela
 
-## 🛠 Tecnologias
+---
+
+## 🛠 Tecnologias utilizadas
 
 * Python
 * Pandas
@@ -33,29 +59,31 @@ O sistema permite processar múltiplos arquivos, gerar métricas e exportar rela
 * OpenPyXL
 * Chardet
 
-## 🚀 Roadmap 🗺️
+---
 
-v1.0 ✅
+## 🗺️ Roadmap
+
+### ✅ v1.0
 
 * Processamento de planilhas
 
-v1.1 ✅
+### ✅ v1.1
 
 * Relatórios em TXT
 
-v1.2 ✅
+### ✅ v1.2
 
 * Relatórios em Excel
 
-v2.0 ✅
+### ✅ v2.0
 
 * Estrutura web com Django
 
-v2.1 ✅
+### ✅ v2.1
 
 * Página HTML inicial
 
-v2.2 ✅
+### ✅ v2.2
 
 * Upload de múltiplos arquivos
 * Suporte a CSV e Excel (.xlsx)
@@ -64,29 +92,62 @@ v2.2 ✅
 * Métricas avançadas
 * Download de relatório via navegador
 
-## 🟡 Próximos passos 🟡
+---
 
-* Gráficos (dashboard visual)
-* Melhor organização do código (services / utils)
-* Feedback visual de sucesso no upload
-* Melhor tratamento de erros na interface
+## 🟡 Próximos passos
+
+* 📊 Dashboard com gráficos
+* 🧱 Melhor organização do código (services / utils)
+* ✅ Feedback visual de sucesso no upload
+* ⚠ Melhor tratamento de erros na interface
+
+---
 
 ## 🔮 Futuro
 
 * Sistema de senhas para atendimento
 * Registro automático de início e fim
 * Dashboard em tempo real
-* Banco de dados e histórico de relatórios
+* Banco de dados com histórico
 * Sistema de login e permissões
+
+---
 
 ## ⚙️ Como rodar o projeto
 
 ```bash
+# Clone o repositório
+git clone https://github.com/SEU-USUARIO/SEU-REPOSITORIO.git
+
+# Acesse a pasta
 cd relatorio_atendimentos
+
+# Ative o ambiente virtual (Windows)
 .\venv\Scripts\activate
+
+# Entre na aplicação web
 cd webapp
+
+# Rode o servidor
 python manage.py runserver
 ```
 
-Acesse no navegador:
+---
+
+## 🌐 Acesse no navegador
+
 http://127.0.0.1:8000/
+
+---
+
+## 📌 Observações
+
+* Certifique-se de que os arquivos possuem as colunas obrigatórias
+* O sistema realiza validação automática e exibirá erros na interface
+* Ideal para análise de produtividade de atendimentos
+
+---
+
+## 👨‍💻 Autor 👨‍💻
+
+Desenvolvido por Fábio Henrique.
