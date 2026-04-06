@@ -81,10 +81,12 @@ v2.2 ✅
 
 ## ⚙️ Como rodar o projeto
 
+```bash
 cd relatorio_atendimentos
 .\venv\Scripts\activate
 cd webapp
 python manage.py runserver
+```
 
 Acesse no navegador:
 http://127.0.0.1:8000/
